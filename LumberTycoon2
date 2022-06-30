@@ -1798,7 +1798,7 @@ local ChatUI=LP.PlayerGui.ChatGUI.Chat;
 local whitelistedPlots={'68, 0, -189, 1, 0, 0, 0, 1, 0, 0, 0, 1','275, 0, -512, 1, 0, 0, 0, 1, 0, 0, 0, 1','383, 0, -250, 1, 0, 0, 0, 1, 0, 0, 0, 1'};
 
 -->Remotes
-local Client_May_Load,Donate,Request_Load,Request_Save,GetMetaData,ClientPurchasedProperty,ClientExpandedProperty,ClientRequestOwnership,ClientIsDragging,TestPing,PlayerChatted,SendUserNotice,ClientSetListPlayer,DestroyStructure,ClientInteracted,ClientPlacedBlueprint,ClientPlacedStructure,RemoteProxy,WipeMetaData,SayMessageRequest,ClientIsWhitelisted=RepStore.LoadSaveRequests.ClientMayLoad,RepStore.Transactions.ClientToServer.Donate,RepStore.LoadSaveRequests.RequestLoad,RepStore.LoadSaveRequests.RequestSave,RepStore.LoadSaveRequests.GetMetaData,RepStore.PropertyPurchasing.ClientPurchasedProperty,RepStore.PropertyPurchasing.ClientExpandedProperty,RepStore.Interaction.ClientRequestOwnership,RepStore.Interaction.ClientIsDragging,RepStore.TestPing,RepStore.NPCDialog.PlayerChatted,RepStore.Notices.SendUserNotice,RepStore.Interaction.ClientSetListPlayer,RepStore.Interaction.DestroyStructure,RepStore.Interaction.ClientInteracted,RepStore.PlaceStructure.ClientPlacedBlueprint,RepStore.PlaceStructure.ClientPlacedStructure,RepStore.Interaction.RemoteProxy,RepStore.LoadSaveRequests.WipeMetaData,RepStore.DefaultChatSystemChatEvents.SayMessageRequest,RepStore.Interaction.ClientIsWhitelisted;
+local Client_May_Load,Donate,Request_Load,Request_Save,GetMetaData,ClientPurchasedProperty,ClientExpandedProperty,ClientIsDragging,TestPing,PlayerChatted,SendUserNotice,ClientSetListPlayer,DestroyStructure,ClientInteracted,ClientPlacedBlueprint,ClientPlacedStructure,RemoteProxy,WipeMetaData,SayMessageRequest,ClientIsWhitelisted=RepStore.LoadSaveRequests.ClientMayLoad,RepStore.Transactions.ClientToServer.Donate,RepStore.LoadSaveRequests.RequestLoad,RepStore.LoadSaveRequests.RequestSave,RepStore.LoadSaveRequests.GetMetaData,RepStore.PropertyPurchasing.ClientPurchasedProperty,RepStore.PropertyPurchasing.ClientExpandedProperty,RepStore.Interaction.ClientIsDragging,RepStore.TestPing,RepStore.NPCDialog.PlayerChatted,RepStore.Notices.SendUserNotice,RepStore.Interaction.ClientSetListPlayer,RepStore.Interaction.DestroyStructure,RepStore.Interaction.ClientInteracted,RepStore.PlaceStructure.ClientPlacedBlueprint,RepStore.PlaceStructure.ClientPlacedStructure,RepStore.Interaction.RemoteProxy,RepStore.LoadSaveRequests.WipeMetaData,RepStore.DefaultChatSystemChatEvents.SayMessageRequest,RepStore.Interaction.ClientIsWhitelisted;
 local Plots,StoreChildren=wrkspc.Properties:GetChildren(),wrkspc.Stores:GetChildren();
 local AxeFolder=RepStore.AxeClasses
 
@@ -2448,9 +2448,8 @@ function Ancestor:BringTree()
         Connections[#Connections+1]={Name='BringTree',Function=workspace.LogModels.ChildAdded:Connect(function(Tree)
             local Owner=Tree:WaitForChild'Owner';
             if Owner.Value==LP then 
-                Tree.PrimaryPart=Tree:FindFirstChild'WoodSection';
                 for i=1,10 do 
-                    ClientRequestOwnership:FireServer(Tree);
+                    Tree.PrimaryPart=Tree:FindFirstChild'WoodSection';
                     ClientIsDragging:FireServer(Tree);
                     Tree:SetPrimaryPartCFrame(OldPos);
                     Stepped:wait();
@@ -2618,7 +2617,7 @@ function Ancestor:DupeInventory()
                 repeat task.wait()until Character:FindFirstChild'HumanoidRootPart'; 
                 Ancestor:GetConnection('DupeInventory',true)
             end)};
-            firetouchinterest(Passenger.Head,Lava,0);
+            LP.Character.Head:Destroy();
             repeat Stepped:wait()until typeof(Ancestor:GetConnection'DupeInventory')~='RBXScriptConnection';
         end;
         repeat Stepped:wait()until Character and Character:FindFirstChild'HumanoidRootPart';
@@ -3683,11 +3682,8 @@ function Ancestor:ModeratePlayer(Option)
     end;
     repeat RunService.Stepped:wait()until LP.Character.Humanoid.SeatPart==Vehicle.DriveSeat;
     local Main=Vehicle:FindFirstChild'Main';
-    if Main then 
-        firetouchinterest(Main,Lava,0);
-    end;
     repeat game:GetService'RunService'.Stepped:wait()
-        Vehicle.Seat.CFrame=Ancestor.PlayerToModerate.Character['Right Leg'].CFrame-Vector3.new(0,.5,0);
+        Vehicle.PrimaryPart.CFrame=Ancestor.PlayerToModerate.Character['Right Leg'].CFrame-Vector3.new(0,.5,0);
     until Ancestor.PlayerToModerate.Character.Humanoid.SeatPart==Vehicle.Seat;
     if Option=='Kill'then
         firetouchinterest(Ancestor.PlayerToModerate.Character.Head,Lava,0);
@@ -3735,7 +3731,7 @@ function Ancestor:AutobuyItems()
             ItemToBuy=Store:FindFirstChild(tstring(AutobuySelectedItem));
         end;
         if i==1 then Ancestor:Teleport(cframe.new(ItemToBuy.PrimaryPart.CFrame.p+vector3.new(5,0,5)));for i=1,2 do TestPing:InvokeServer();end;end;
-        repeat Stepped:wait()ClientRequestOwnership:FireServer(ItemToBuy)ClientIsDragging:FireServer(ItemToBuy)ItemToBuy:SetPrimaryPartCFrame(cframe.new(Counter.CFrame.p))until (Counter.CFrame.p-ItemToBuy.PrimaryPart.CFrame.p).Magnitude<8;
+        repeat Stepped:wait()ClientIsDragging:FireServer(ItemToBuy)ItemToBuy:SetPrimaryPartCFrame(cframe.new(Counter.CFrame.p))until (Counter.CFrame.p-ItemToBuy.PrimaryPart.CFrame.p).Magnitude<8;
         Connections[#Connections+1]={Name='AutobuyConnection',Function=wrkspc.PlayerModels.ChildAdded:Connect(function(Child)
             local Owner=Child:WaitForChild('Owner',5);
             if Owner.Value==LP then 
